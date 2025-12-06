@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <title>{{ name }} - Player</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#6366f1">
 
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -70,13 +73,18 @@
         <strong>Now playing:</strong> {{ name }}
       </div>
 
-      <video controls preload="metadata" playsinline>
-        <source
-          src="{{ url_for('stream_file', filename=relpath) }}"
-          type="{{ mimetype }}"
-        />
-        Your browser does not support the video tag.
+      <video
+        id="main-video"
+        controls
+        preload="auto"
+        playsinline
+        style="width: 100%; max-height: 80vh; border-radius: 12px; background: #000;">
       </video>
+      
+      <div class="alert alert-warning mt-3" role="alert" id="video-error" style="display: none;">
+        Unable to play this video format in the browser. 
+        <a href="{{ url_for('download_file', filename=relpath) }}" class="alert-link">Download to watch locally</a>.
+      </div>
     </main>
 
     <footer class="footer-meta text-center">
@@ -87,5 +95,146 @@
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <!-- App JS (Wake Lock) -->
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <!-- Enhanced Player JS -->
+    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
+
+    <!-- mpegts.js for TS/FLV support -->
+    <script src="https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.js"></script>
+
+    <script>
+      (function() {
+        const mime = {{ mimetype|tojson }};
+        const fileUrl = {{ url_for('stream_file', filename=relpath)|tojson }};
+        const videoElement = document.getElementById('main-video');
+        const errorDiv = document.getElementById('video-error');
+        
+        let mpegtsPlayer = null;
+
+        console.log('=== Video Player Initialization ===');
+        console.log('MIME type:', mime);
+        console.log('File URL:', fileUrl);
+
+        function showError(message) {
+          console.error(message);
+          errorDiv.style.display = 'block';
+          videoElement.style.display = 'none';
+        }
+
+        function initMpegtsPlayer() {
+          console.log('Initializing mpegts.js player...');
+          
+          if (typeof mpegts === 'undefined') {
+            showError('mpegts.js library not loaded');
+            return;
+          }
+
+          if (!mpegts.getFeatureList().mseLivePlayback) {
+            showError('MSE (Media Source Extensions) not supported in this browser');
+            return;
+          }
+
+          try {
+            const playerType = mime === 'video/x-flv' ? 'flv' : 'mpegts';
+            console.log('Creating mpegts player with type:', playerType);
+
+            mpegtsPlayer = mpegts.createPlayer({
+              type: playerType,
+              isLive: false,
+              url: fileUrl
+            });
+
+            mpegtsPlayer.attachMediaElement(videoElement);
+
+            mpegtsPlayer.on(mpegts.Events.ERROR, (errorType, errorDetail, errorInfo) => {
+              console.error('mpegts.js error:', { errorType, errorDetail, errorInfo });
+              showError('Video playback error: ' + errorDetail);
+            });
+
+            mpegtsPlayer.on(mpegts.Events.LOADING_COMPLETE, () => {
+              console.log('✓ Video loading complete');
+            });
+
+            mpegtsPlayer.on(mpegts.Events.METADATA_ARRIVED, () => {
+              console.log('✓ Video metadata loaded');
+            });
+
+            mpegtsPlayer.load();
+            console.log('✓ mpegts.js player initialized successfully');
+
+          } catch (error) {
+            console.error('Exception creating mpegts player:', error);
+            showError('Failed to initialize video player: ' + error.message);
+          }
+        }
+
+        function initNativePlayer() {
+          console.log('Initializing native HTML5 player...');
+          
+          videoElement.src = fileUrl;
+          
+          videoElement.addEventListener('error', function(e) {
+            const error = videoElement.error;
+            let errorMessage = 'Unknown error';
+            
+            if (error) {
+              switch (error.code) {
+                case error.MEDIA_ERR_ABORTED:
+                  errorMessage = 'Playback aborted';
+                  break;
+                case error.MEDIA_ERR_NETWORK:
+                  errorMessage = 'Network error';
+                  break;
+                case error.MEDIA_ERR_DECODE:
+                  errorMessage = 'Decode error - codec not supported';
+                  break;
+                case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                  errorMessage = 'Format not supported';
+                  break;
+              }
+            }
+            
+            console.error('Native player error:', errorMessage, error);
+            showError('Playback error: ' + errorMessage);
+          });
+
+          videoElement.addEventListener('loadedmetadata', () => {
+            console.log('✓ Video metadata loaded');
+          });
+
+          videoElement.addEventListener('canplay', () => {
+            console.log('✓ Video ready to play');
+          });
+
+          console.log('✓ Native player initialized');
+        }
+
+        // Decide which player to use based on MIME type
+        if (mime === 'video/mp2t' || mime === 'video/x-flv') {
+          console.log('→ Using mpegts.js for TS/FLV playback');
+          initMpegtsPlayer();
+        } else {
+          console.log('→ Using native HTML5 player');
+          initNativePlayer();
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+          if (mpegtsPlayer) {
+            mpegtsPlayer.destroy();
+          }
+        });
+
+      })();
+    </script>
+    
+    <style>
+      #main-video {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+      
+      #main-video:focus {
+        outline: none;
+      }
+    </style>
   </body>
 </html>

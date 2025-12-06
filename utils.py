@@ -7,6 +7,87 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from config import AppConfig
 
+# Comprehensive media type definitions
+VIDEO_TYPES = {
+    ".mp4": "video/mp4",
+    ".mkv": "video/x-matroska",
+    ".avi": "video/x-msvideo",
+    ".mov": "video/quicktime",
+    ".wmv": "video/x-ms-wmv",
+    ".flv": "video/x-flv",
+    ".webm": "video/webm",
+    ".m4v": "video/x-m4v",
+    ".mpg": "video/mpeg",
+    ".mpeg": "video/mpeg",
+    ".m2v": "video/mpeg",
+    ".3gp": "video/3gpp",
+    ".3g2": "video/3gpp2",
+    ".ts": "video/mp2t",
+    ".mts": "video/mp2t",
+    ".m2ts": "video/mp2t",
+    ".ogv": "video/ogg",
+    ".divx": "video/x-divx",
+    ".f4v": "video/mp4",
+    ".vob": "video/dvd",
+    ".asf": "video/x-ms-asf",
+    ".rm": "video/vnd.rn-realmedia",
+    ".rmvb": "video/vnd.rn-realmedia-vbr",
+}
+
+AUDIO_TYPES = {
+    ".mp3": "audio/mpeg",
+    ".wav": "audio/wav",
+    ".flac": "audio/flac",
+    ".aac": "audio/aac",
+    ".ogg": "audio/ogg",
+    ".m4a": "audio/mp4",
+    ".wma": "audio/x-ms-wma",
+    ".opus": "audio/opus",
+    ".alac": "audio/x-alac",
+    ".ape": "audio/x-ape",
+}
+
+IMAGE_TYPES = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".bmp": "image/bmp",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".tiff": "image/tiff",
+    ".tif": "image/tiff",
+    ".heic": "image/heic",
+    ".heif": "image/heif",
+}
+
+DOCUMENT_TYPES = {
+    ".pdf": "application/pdf",
+    ".txt": "text/plain",
+    ".md": "text/markdown",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".xls": "application/vnd.ms-excel",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".ppt": "application/vnd.ms-powerpoint",
+    ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+}
+
+ARCHIVE_TYPES = {
+    ".zip": "application/zip",
+    ".rar": "application/x-rar-compressed",
+    ".7z": "application/x-7z-compressed",
+    ".tar": "application/x-tar",
+    ".gz": "application/gzip",
+    ".bz2": "application/x-bzip2",
+}
+
+# Register all types with mimetypes
+for type_dict in [VIDEO_TYPES, AUDIO_TYPES, IMAGE_TYPES, DOCUMENT_TYPES, ARCHIVE_TYPES]:
+    for ext, mime in type_dict.items():
+        mimetypes.add_type(mime, ext)
+
 def human_size(num_bytes: float) -> str:
     """Convert bytes to a human-readable string (e.g., '1.5 MB')."""
     for unit in ["B", "KB", "MB", "GB", "TB"]:
@@ -19,13 +100,44 @@ def detect_type(mimetype: Optional[str]) -> str:
     """Detect the general type of a file based on its mimetype."""
     if not mimetype:
         return "other"
-    if mimetype.startswith("video"):
+    
+    # Check main type first
+    main_type = mimetype.split('/')[0]
+    
+    if main_type == "video":
         return "video"
-    if mimetype.startswith("image"):
-        return "image"
-    if mimetype.startswith("audio"):
+    elif main_type == "audio":
         return "audio"
+    elif main_type == "image":
+        return "image"
+    elif mimetype in DOCUMENT_TYPES.values():
+        return "document"
+    elif mimetype in ARCHIVE_TYPES.values():
+        return "archive"
+    elif mimetype.startswith("text/"):
+        return "document"
+    
     return "other"
+
+def get_file_category(file_path: Path) -> str:
+    """Get file category based on extension and mimetype."""
+    ext = file_path.suffix.lower()
+    
+    # Check against known types
+    if ext in VIDEO_TYPES:
+        return "video"
+    elif ext in AUDIO_TYPES:
+        return "audio"
+    elif ext in IMAGE_TYPES:
+        return "image"
+    elif ext in DOCUMENT_TYPES:
+        return "document"
+    elif ext in ARCHIVE_TYPES:
+        return "archive"
+    
+    # Fallback to mimetype detection
+    mimetype, _ = mimetypes.guess_type(str(file_path))
+    return detect_type(mimetype)
 
 def safe_rel_path(rel: str) -> Path:
     """
@@ -144,7 +256,7 @@ def list_dir(config: AppConfig, current_dir: Path) -> Tuple[List[Dict], List[Dic
                 mtime_str = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
                 mimetype, _ = mimetypes.guess_type(str(entry))
                 ext = entry.suffix.lower().lstrip(".")
-                ftype = detect_type(mimetype or "application/octet-stream")
+                ftype = get_file_category(entry)
                 
                 files.append({
                     "name": entry.name,
@@ -153,8 +265,6 @@ def list_dir(config: AppConfig, current_dir: Path) -> Tuple[List[Dict], List[Dic
                     "size_human": human_size(size),
                     "mimetype": mimetype or "application/octet-stream",
                     "ext": ext,
-                    "is_video": ftype == "video",
-                    "is_image": ftype == "image",
                     "type": ftype,
                     "mtime": mtime,
                     "mtime_str": mtime_str,

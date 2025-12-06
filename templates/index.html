@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <title>Media Server</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#6366f1">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
@@ -180,9 +183,11 @@
             <div class="media-card file-card">
               <div class="card-header">
                 <div class="file-icon">
-                  {% if f.is_video %}🎬
-                  {% elif f.is_image %}🖼️
-                  {% elif f.is_audio %}🎵
+                  {% if f.type == 'video' %}🎬
+                  {% elif f.type == 'image' %}🖼️
+                  {% elif f.type == 'audio' %}🎵
+                  {% elif f.type == 'document' %}📄
+                  {% elif f.type == 'archive' %}📦
                   {% else %}📄{% endif %}
                 </div>
                 <span class="file-type">{{ f.ext or "file" }}</span>
@@ -192,9 +197,11 @@
                 <p class="card-subtitle">{{ f.size_human }} • {{ f.mtime_str }}</p>
               </div>
               <div class="card-actions">
-                {% if f.is_video %}
+                {% if f.type == 'video' %}
                   <a href="{{ url_for('stream_page', filename=f.relpath) }}" class="primary-action">▶ Play</a>
-                {% elif f.is_image %}
+                {% elif f.type == 'audio' %}
+                  <a href="{{ url_for('audio_page', filename=f.relpath) }}" class="primary-action">▶ Play</a>
+                {% elif f.type == 'image' %}
                   <a href="{{ url_for('download_file', filename=f.relpath) }}" target="_blank" class="primary-action">👁 View</a>
                 {% else %}
                   <a href="{{ url_for('download_file', filename=f.relpath) }}" download class="secondary-action">⬇ Download</a>

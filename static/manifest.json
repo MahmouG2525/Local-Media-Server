@@ -1,0 +1,19 @@
+{
+  "name": "Local Media Server",
+  "short_name": "Media Server",
+  "description": "Stream your local media files with a professional interface",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/static/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "multimedia"],
+  "orientation": "any"
+}

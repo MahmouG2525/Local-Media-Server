@@ -25,11 +25,27 @@ Stream your local media files with a premium, Netflix-style web interface
 - **Dark/Light Themes** - Seamless theme switching with localStorage persistence
 - **Responsive Design** - Perfect on mobile, tablet, and desktop (1-5 column grid)
 
-### 🎬 **Media Playback**
-- **Video Streaming** - HTML5 video player with range request support
-- **Image Viewer** - Modal lightbox with keyboard navigation
-- **Wake Lock API** - Prevents screen sleep during video playback
-- **Auto-detection** - Automatic file type recognition
+### 🎬 **Professional Video Player**
+- **HTML5 Video** with range request support for smooth seeking
+- **10+ Keyboard Shortcuts** - Space, Arrows, F, M, P, < >, and more
+- **Playback Speed Control** - 0.25x to 2x with visual indicator
+- **Picture-in-Picture** - Watch while browsing
+- **Fullscreen Mode** - Immersive viewing experience
+- **Visual Feedback** - On-screen overlays for all actions
+- **TS/FLV Support** - Advanced format playback via mpegts.js
+
+### 🎵 **Audio Player** 
+- **Dedicated UI** - Clean audio player with album art placeholder
+- **Time Display** - Current position and total duration
+- **Keyboard Controls** - Same shortcuts as video player
+- **Native HTML5** - Reliable cross-browser playback
+
+### 🖼️ **Media Support** (65+ Formats)
+- **Video** (23 formats): MP4, MKV, AVI, MOV, TS, FLV, WebM, M2TS, VOB, and more
+- **Audio** (10 formats): MP3, FLAC, WAV, AAC, OGG, M4A, WMA, Opus, ALAC, APE
+- **Images** (13 formats): JPG, PNG, GIF, WebP, SVG, HEIC, HEIF, TIFF, BMP, ICO
+- **Documents** (9 formats): PDF, TXT, MD, DOC, DOCX, XLS, XLSX, PPT, PPTX
+- **Archives** (6 formats): ZIP, RAR, 7Z, TAR, GZ, BZ2
 
 ### 🔐 **Security & Control**
 - **Password Protection** - Optional authentication for web access
@@ -47,7 +63,7 @@ Stream your local media files with a premium, Netflix-style web interface
 ### 📁 **File Management**
 - **Browse Folders** - Navigate directory structure
 - **Search & Filter** - Find files by name, type, size, or date
-- **Multiple Formats** - Videos, images, audio, documents
+- **Auto-Detection** - Smart file type recognition with category icons
 - **Batch Upload** - Multiple file upload support
 - **File Operations** - Download, stream, delete (admin only)
 
@@ -137,6 +153,30 @@ python -m server --host 0.0.0.0 --port 5000
 - Type: All, Video, Image, Audio, Other
 - Sort: Name, Size, Date
 - Order: Ascending/Descending
+
+### Keyboard Shortcuts (Video/Audio Player)
+
+**Playback Control**
+- `Space` or `K` - Play/Pause
+- `←` (Left Arrow) - Seek backward 5 seconds
+- `→` (Right Arrow) - Seek forward 5 seconds
+- `0` or `Home` - Restart video
+- `End` - Jump to end
+
+**Volume**
+- `↑` (Up Arrow) - Increase volume 10%
+- `↓` (Down Arrow) - Decrease volume 10%
+- `M` - Mute/Unmute
+
+**Playback Speed** (Video only)
+- `>` or `.` - Increase speed
+- `<` or `,` - Decrease speed
+
+**View Modes** (Video only)
+- `F` - Toggle fullscreen
+- `P` - Toggle Picture-in-Picture
+
+> **Tip**: Shortcuts work anywhere on the player page - no need to focus on the video!
 
 ---
 
@@ -322,9 +362,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📬 Contact
 
-**Project Link**: [https://github.com/yourusername/Local-Media-Server](https://github.com/yourusername/Local-Media-Server)
+**Project Link**: [https://github.com/MahmouG2525/Local-Media-Server](https://github.com/MahmouG2525/Local-Media-Server)
 
-**Issues**: [https://github.com/yourusername/Local-Media-Server/issues](https://github.com/yourusername/Local-Media-Server/issues)
+**Issues**: [https://github.com/MahmouG2525/Local-Media-Server/issues](https://github.com/MahmouG2525/Local-Media-Server/issues)
 
 ---
 

@@ -149,6 +149,25 @@ class ServerThread(QThread):
                 mimetype=mimetype or "video/mp4"
             )
 
+        @app.route("/audio/<path:filename>")
+        @requires_auth
+        def audio_page(filename):
+            """Audio player page"""
+            try:
+                full_path = utils.get_file_safe(self.config, filename)
+            except Exception:
+                abort(404)
+                
+            if not full_path.exists():
+                abort(404)
+            mimetype, _ = mimetypes.guess_type(str(full_path))
+            return render_template(
+                "audio.html",
+                name=full_path.name,
+                relpath=filename,
+                mimetype=mimetype or "audio/mpeg"
+            )
+
         @app.route("/download/<path:filename>")
         @requires_auth
         def download_file(filename):
