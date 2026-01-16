@@ -84,7 +84,7 @@ Stream your local media files with a premium, Netflix-style web interface
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/Local-Media-Server.git
+   git clone https://github.com/MahmoudG25/Local-Media-Server.git
    cd Local-Media-Server
    ```
 
