@@ -13,6 +13,11 @@ Stream your local media files with a premium, Netflix-style web interface
 
 [Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Screenshots](#-screenshots) • [Tech Stack](#-tech-stack)
 
+<br>
+
+<img src="assets/Main Interface (Dark Theme).png" alt="Local Media Server Hero" width="100%">
+
+
 </div>
 
 ---
@@ -184,15 +189,23 @@ python -m server --host 0.0.0.0 --port 5000
 
 ### Main Interface (Dark Theme)
 Beautiful card-based layout with gradient accents and smooth shadows.
+![Main Interface (Dark Theme)](assets/Main%20Interface%20(Dark%20Theme).png)
+
+### Main Interface (Light Theme)
+Seamless light theme for bright environments.
+![Main Interface (Light Theme)](assets/Main%20Interface%20(Light%20Theme).png)
 
 ### Video Player
 Fullscreen HTML5 player with custom controls and wake lock support.
+![Video Player](assets/Video%20Player.png)
 
 ### Image Lightbox
 Modal viewer with navigation and file information.
+![Image Lightbox](assets/Image%20Lightbox.png)
 
 ### Admin GUI
 PySide6 desktop application for server management.
+![Admin GUI](assets/Admin%20GUI.png)
 
 ---
 
